@@ -2,9 +2,7 @@
 
 module.exports = function (grunt) {
 
-  // Define the configuration for all the tasks
-  grunt.initConfig({
-	// Time how long tasks take. Can help when optimizing build times
+  // Time how long tasks take. Can help when optimizing build times
   require('time-grunt')(grunt);
 
   // Automatically load required Grunt tasks
@@ -34,6 +32,5 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('default',['build']);
-  });
 
 };
