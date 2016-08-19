@@ -1,7 +1,7 @@
 'use strict';
 angular.module('confusionApp', [])
 
-        .controller('menuController', ['$scope', function($scope) {
+        .controller('MenuController', ['$scope', function($scope) {
             $scope.tab = 1;
             $scope.filtText = '';
 			$scope.showDetails = false;
@@ -78,7 +78,7 @@ angular.module('confusionApp', [])
         .controller('FeedbackController', ['$scope', function($scope) {
                         $scope.sendFeedback = function() {
                                 console.log($scope.feedback);
-                if ($scope.feedback.agree && ($scope.feedback.mychannel == "")&& !$scope.feedback.mychannel) {
+                if ($scope.feedback.agree && ($scope.feedback.mychannel === "")&& !$scope.feedback.mychannel) {
 					$scope.invalidChannelSelection = true;
                     console.log('incorrect');
                 }
@@ -177,5 +177,5 @@ angular.module('confusionApp', [])
                             date:""
                             };
                 $scope.dishCmnt = dishCmnt;
-            }
+            };
         }]);
