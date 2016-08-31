@@ -8,11 +8,17 @@ angular.module('confusionApp')
             $scope.filtText = '';
 			$scope.showDetails = false;
             
-            $scope.dishes = [];
+            $scope.showMenu = false;
+            $scope.message = "Loading menu...";
+            $scope.dishes = {};
             menuFactory.getDishes()
             .then(
                 function(response) {
                     $scope.dishes = response.data;
+                    $scope.showMenu = true;
+                },
+                function(response) {
+                    $scope.message = "Error: "+response.status + " " + response.statusText;
                 }
             );
 
@@ -78,11 +84,16 @@ angular.module('confusionApp')
 
             //var dish= menuFactory.getDish(parseInt($stateParams.id,10));
             $scope.dish = {};
+            $scope.showDish = false;
+            $scope.message = "Loading dish detail...";
                     menuFactory.getDish(parseInt($stateParams.id,10))
             .then(
                 function(response){
                     $scope.dish = response.data;
                     $scope.showDish=true;
+                },
+                function(response) {
+                    $scope.message = "Error: "+response.status + " " + response.statusText;
                 }
             );
             
@@ -110,17 +121,22 @@ angular.module('confusionApp')
         // implement the IndexController and About Controller here
         .controller('IndexController', ['$scope','menuFactory','corporateFactory', function($scope, menuFactory, corporateFactory) {
             
-            $scope.showDish = false;
             $scope.featDish = {};
+            $scope.showDish = false;
+            $scope.message = "Loading index...";
+            
                 menuFactory.getDish(0)
                         .then(
                             function(response){
                                 $scope.featDish = response.data;
                                 $scope.showDish = true;
+                            },
+                            function(response) {
+                                $scope.message = "Error: "+response.status + " " + response.statusText;
                             }
                         );
             //$scope.featDish = {'name':'Uthapizza'};
-            $scope.message = 'This is what you see when showDish is false';
+            //$scope.message = 'This is what you see when showDish is false';
             //console.log($scope.featDish.category);
             
             $scope.featPromotion = menuFactory.getPromotion(0);
