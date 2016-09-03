@@ -54,7 +54,11 @@
         <div class="row row-content">
             <div class="col-xs-12 col-sm-9">
                 <h2>Corporate Leadership</h2>
-               <ul class="media-list">
+                <div ng-if="!showLdrs">
+                    <h3>{{ldrsMessage}}</h3>
+                </div>
+                <div ng-if="showLdrs">
+                <ul class="media-list">
 					<!--h4>Implement the Corporate Leaders List here</h4-->
                 <li class="media" ng-repeat="ldrs in leaders">
                     <div class="media-left media-middle">
@@ -70,7 +74,7 @@
                     </div>
                    </li>
                </ul>
-
+               </div>
             </div>
              <div class="col-xs-12 col-sm-3">
                 <p style="padding:20px;"></p>

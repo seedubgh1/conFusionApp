@@ -5,7 +5,7 @@ angular.module('confusionApp')
 
         .service('menuFactory', ['$resource', 'baseURL', function($resource,baseURL) {
     
-			var promotions = [
+			/*var promotions = [
                 {
                           _id:0,
                           name:'Weekend Grand Buffet', 
@@ -15,7 +15,7 @@ angular.module('confusionApp')
                           description:'Featuring mouthwatering combinations with a choice of five different salads, six enticing appetizers, six main entrees and five choicest desserts. Free flowing bubbly and soft drinks. All for just $19.99 per person ',
                 }
                 
-                        ];
+                        ];*/
 
 			this.getDishes = function(){
                   return $resource(baseURL+"dishes/:id",null,  {'update':{method:'PUT' }});
@@ -25,16 +25,17 @@ angular.module('confusionApp')
                 // implement a function named getPromotion
                 // that returns a selected promotion.
             this.getPromotion = function(index) {
-                    return promotions[index];
+                //    return promotions[index];
+                return $resource(baseURL+"promotions/:id",null, {'update':{method:'PUT' }});
     
             };
         }])
 
-        .factory('corporateFactory', function() {
+        .factory('corporateFactory', ['$resource', 'baseURL', function($resource,baseURL) {
     
             var corpfac = {};
     
-            var leadership = [
+            /*var leadership = [
                 {
                     name: "Peter Pan",
                     image: 'images/alberto.png',
@@ -64,23 +65,24 @@ angular.module('confusionApp')
                     description: "Award winning three-star Michelin chef with wide International experience having worked closely with whos-who in the culinary world, he specializes in creating mouthwatering Indo-Italian fusion experiences. He says, Put together the cuisines from the two craziest cultures, and you get a winning hit! Amma Mia!"
                 }
                 
-            ];
+            ];*/
      
             // Implement two functions, one named getLeaders,
             // the other named getLeader(index)
             // Remember this is a factory not a service
             
             corpfac.getLeaders = function() {
-                return leadership;
+                //return leadership;
+                return $resource(baseURL+"leadership/:id",null,  {'update':{method:'PUT' }});
             };
     
-            corpfac.getLeader = function(index) {
+            /*corpfac.getLeader = function(index) {
                 return leadership[index];
-            };
+            };*/
     
     
             return corpfac;
     
-        })
+        }])
 
 ;

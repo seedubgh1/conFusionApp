@@ -117,7 +117,7 @@ angular.module('confusionApp')
         .controller('IndexController', ['$scope','menuFactory','corporateFactory', function($scope, menuFactory, corporateFactory) {
             
             $scope.showDish = false;
-            $scope.message="Loading ...";
+            $scope.message="Loading featured dish...";
             $scope.featDish = menuFactory.getDishes().get({id:0})
                         .$promise.then(
                             function(response){
@@ -133,13 +133,49 @@ angular.module('confusionApp')
             //$scope.message = 'This is what you see when showDish is false';
             //console.log($scope.featDish.category);
             
-            $scope.featPromotion = menuFactory.getPromotion(0);
-            $scope.leader = corporateFactory.getLeader(3);
+            //$scope.featPromotion = menuFactory.getPromotion(0);
+            $scope.showPromo = false;
+            $scope.promoMessage="Loading promotion...";
+            $scope.featPromotion = menuFactory.getPromotion().get({id:0})
+                        .$promise.then(
+                            function(response){
+                                $scope.featPromotion = response;
+                                $scope.showPromo = true;
+                            },
+                            function(response) {
+                                $scope.promoMessage = "Error: "+response.status + " " + response.statusText;
+                            }
+                        );
+            //$scope.leader = corporateFactory.getLeader(3);
+            $scope.showLeader = false;
+            $scope.leaderMessage = "Loading leader...";
+            $scope.leader = corporateFactory.getLeaders().get({id:0})
+                        .$promise.then(
+                            function(response){
+                                $scope.leader = response;
+                                $scope.showLeader = true;
+                            },
+                            function(response) {
+                                $scope.leaderMessage = "Error: "+response.status + " " + response.statusText;
+                            }
+                        );
         }])
 
         .controller('AboutController', ['$scope','corporateFactory', function($scope, corporateFactory) {
             
-            $scope.leaders = corporateFactory.getLeaders();
+            //$scope.leaders = corporateFactory.getLeaders();
+            
+            $scope.showLdrs = false;
+            $scope.ldrsMessage = "Loading leadership...";
+                        corporateFactory.getLeaders().query()
+                    .$promise.then(
+                        function(response) {
+                    $scope.leaders = response;
+                    $scope.showLdrs = true;
+                },
+                function(response) {
+                    $scope.ldrsMessage = "Error: "+response.status + " " + response.statusText;
+                });
             
         }])
                 
