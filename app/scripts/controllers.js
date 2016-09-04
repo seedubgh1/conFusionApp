@@ -56,22 +56,24 @@ angular.module('confusionApp')
                         
         }])
 
-        .controller('FeedbackController', ['$scope', function($scope) {
+        .controller('FeedbackController', ['$scope', 'feedbackFactory', function($scope, feedbackFactory) {
             
-                        $scope.sendFeedback = function() {
-                
-                                console.log($scope.feedback);
+            $scope.sendFeedback = function() {
                 
                 if ($scope.feedback.agree && ($scope.feedback.mychannel === "")) {
 					$scope.invalidChannelSelection = true;
-                    console.log('incorrect');
+                    console.log('channel selection is not valid');
                 }
                 else {
+                    
+                    console.log($scope.feedback);
+                    feedbackFactory.getFeedback().save($scope.feedback);
+                    
                     $scope.invalidChannelSelection = false;
                     $scope.feedback = {mychannel:"", firstName:"", lastName:"", agree:false, email:"" };
                     $scope.feedback.mychannel="";
                     $scope.feedbackForm.$setPristine();
-                    console.log($scope.feedback);
+                    //console.log($scope.feedback);
                 }
             };
         }])
@@ -170,12 +172,13 @@ angular.module('confusionApp')
                         corporateFactory.getLeaders().query()
                     .$promise.then(
                         function(response) {
-                    $scope.leaders = response;
-                    $scope.showLdrs = true;
-                },
-                function(response) {
-                    $scope.ldrsMessage = "Error: "+response.status + " " + response.statusText;
-                });
+                            $scope.leaders = response;
+                            $scope.showLdrs = true;
+                        },
+                        function(response) {
+                            $scope.ldrsMessage = "Error: "+response.status + " " + response.statusText;
+                        }
+                    );
             
         }])
                 
