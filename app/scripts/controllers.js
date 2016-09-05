@@ -138,7 +138,8 @@ angular.module('confusionApp')
             //$scope.featPromotion = menuFactory.getPromotion(0);
             $scope.showPromo = false;
             $scope.promoMessage="Loading promotion...";
-            $scope.featPromotion = menuFactory.getPromotion().get({id:0})
+            //$scope.featPromotion = menuFactory.getPromotion().get({id:0})
+            $scope.featPromotion = menuFactory.getPromotion(0).get()
                         .$promise.then(
                             function(response){
                                 $scope.featPromotion = response;
@@ -151,7 +152,7 @@ angular.module('confusionApp')
             //$scope.leader = corporateFactory.getLeader(3);
             $scope.showLeader = false;
             $scope.leaderMessage = "Loading leader...";
-            $scope.leader = corporateFactory.getLeaders().get({id:0})
+            $scope.leader = corporateFactory.getLeaders().get({id:3})
                         .$promise.then(
                             function(response){
                                 $scope.leader = response;

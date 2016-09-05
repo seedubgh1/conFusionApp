@@ -21,7 +21,8 @@ angular.module('confusionApp')
                                     };
 
             this.getPromotion = function(index) {
-                return $resource(baseURL+"promotions/:id",null);
+                //return $resource(baseURL+"promotions/:id",null);
+                return $resource(baseURL+"promotions/" + index)
     
             };
         }])
