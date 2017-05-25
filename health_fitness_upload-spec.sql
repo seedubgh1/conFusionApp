@@ -10,6 +10,14 @@ create or replace package HCD_OWNER.health_fitness_upload as
   function get_episode_id(p_emp_cred emp_cred_t
                          ,p_entry_name varchar2) return varchar2;
 
+  function get_google_access_token(p_client_id varchar2
+                                  ,p_client_secret varchar2
+                                  ,p_refresh_token varchar2
+                                  ) return gfit_access_tkn_t;
+  
+  function get_data_strm_id(p_token gfit_access_tkn_t
+                           ,p_data_strm_nm varchar2) return varchar;
+  
   function post_data(p_emp_cred     emp_cred_t
                     ,p_episode_id   varchar2
                     ,p_external_src varchar2

@@ -435,13 +435,105 @@ function java_dt2epoch (p_dt date) return number is
 
   end post_data;
 --==============================================================
-  function get_gfit_access_token(p_client_id varchar2
-                                ,p_client_secret varchar2
-                                ,p_refresh_token varchar2
-                                ) return gfit_access_tkn_t is
+  function get_google_access_token(p_client_id varchar2
+                                  ,p_client_secret varchar2
+                                  ,p_refresh_token varchar2
+                                  ) return gfit_access_tkn_t is
+    
+    l_post_body  clob;
+    l_token_clob clob;
+    l_access_tkn gfit_access_tkn_t;
+    l_resp utl_http.resp;
+    
     begin
-      null;
-    end get_gfit_access_token;
+      
+      l_post_body := 'myform' || chr(38) || 
+                     'client_secret=' || p_client_secret || chr(38) ||
+                     'grant_type=refresh_token' || chr(38) ||
+                     'refresh_token=' || p_refresh_token || chr(38) ||
+                     'client_id=' || p_client_id;
+      
+      DBMS_LOB.createtemporary(l_token_clob, FALSE);
+
+      l_token_clob := https_call(p_body          => l_post_body
+                                ,p_url           => 'https://www.googleapis.com/oauth2/v3/token'
+                                ,p_operation     => 'POST'
+                                ,p_version       => HTTP_VERSION_1_1
+                                ,p_content_type  => 'application/x-www-form-urlencoded'
+                                ,p_soap_action   => null
+                                ,p_accept        => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                                ,p_authorization => null
+                                ,p_resp          => l_resp);
+
+      if l_resp.status_code = 200 then
+        -- parse access token, token type, expiration interval
+        l_access_tkn := null;
+
+        FOR tkn_rec IN (SELECT atx, ttx, eix
+               FROM json_table((select l_token_clob from dual),
+               '$' COLUMNS(
+                 atx PATH '$.access_token',
+                 ttx PATH '$.token_type',
+                 eix PATH '$.expires_in'))
+                 ) LOOP
+
+          l_access_tkn.access_token := tkn_rec.atx;
+          l_access_tkn.token_type   := tkn_rec.ttx;
+          l_access_tkn.expires_in   := tkn_rec.eix;
+
+        end loop;
+
+
+      end if;
+      
+      return l_access_tkn;
+      
+    end get_google_access_token;
+--==============================================================
+  function get_data_strm_id(p_token gfit_access_tkn_t
+                           ,p_data_strm_nm varchar2) return varchar is
+    
+    l_resp utl_http.resp;
+    l_data_ID_clob clob;
+    l_data_strm_id varchar2(200);
+    
+    begin
+      
+      DBMS_LOB.createtemporary(l_data_ID_clob, FALSE);
+      
+      l_data_ID_clob :=  https_call(p_body          => null
+                                   ,p_url           => 'https://www.googleapis.com/fitness/v1/users/me/dataSources'
+                                   ,p_operation     => 'GET'
+                                   ,p_version       => HTTP_VERSION_1_1
+                                   ,p_content_type  => 'application/x-www-form-urlencoded'
+                                   ,p_soap_action   => null
+                                   ,p_accept        => 'application/json'
+                                   ,p_authorization => p_token.token_type || ' ' || p_token.access_token
+                                   ,p_resp          => l_resp);
+    
+      if l_resp.status_code = 200 then
+        
+        l_data_strm_id := '';
+        
+        for data_src in (select jt.dataStreamId
+                     from json_table((select l_data_ID_clob from dual),
+                     '$.dataSource[*]'
+                     columns(
+                     dataStreamId PATH '$.dataStreamId')
+                     ) jt
+                     ) loop
+
+          if instr(data_src.datastreamId, p_data_strm_nm) > 0 then
+            l_data_strm_id := data_src.datastreamId;
+          end if;
+
+        end loop;
+      
+      end if;
+      
+      return l_data_strm_id;
+    
+    end get_data_strm_id;
 --==============================================================
   procedure upload_googlefit is
     ---
