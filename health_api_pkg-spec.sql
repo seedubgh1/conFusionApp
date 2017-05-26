@@ -12,6 +12,6 @@ create or replace package health_api_pkg as
     p_accept        VARCHAR2,
     p_authorization VARCHAR2) RETURN RQST_RESP_T;
 
- function parse_resp(p_http in RQST_RESP_T) return clob;
+ function parse_resp(p_http in out nocopy RQST_RESP_T) return clob;
 
 end health_api_pkg;

@@ -76,29 +76,27 @@ EXCEPTION
   error_queue('HEALTH_API', sqlerrm, 'HTTPS_CALL');
 END https_call;
 ---===============================================================
- function parse_resp(p_http in RQST_RESP_T) return clob is
+ function parse_resp(p_http in out nocopy RQST_RESP_T) return clob is
  
     l_clob CLOB;
     l_text VARCHAR2(32767);
-    l_resp utl_http.resp := p_http.resp;
-    l_rqst utl_http.req  := p_http.rqst;
  begin
  
  DBMS_LOB.createtemporary(l_clob, FALSE);
   --dbms_output.put_line(l_resp.status_code || '/' ||l_resp.reason_phrase || '/' || sqlerrm);
-  IF (l_resp.status_code IN (HTTP_OK, HTTP_CREATED, HTTP_BAD_REQUEST, HTTP_UNAUTHORIZED)) THEN
+  IF (p_http.resp.status_code IN (HTTP_OK, HTTP_CREATED, HTTP_BAD_REQUEST, HTTP_UNAUTHORIZED)) THEN
 --    DBMS_LOB.createtemporary(l_clob, FALSE);
     BEGIN
       LOOP
-        UTL_HTTP.read_text(l_resp, l_text, 300);
+        UTL_HTTP.read_text(p_http.resp, l_text, 300);
         l_text := REPLACE(l_text,'<![CDATA[','');
         --dbms_output.put_line(l_text);
         DBMS_LOB.writeappend(l_clob, LENGTH(l_text), l_text);
       END LOOP;
-      UTL_HTTP.end_response(l_resp);
+      UTL_HTTP.end_response(p_http.resp);
     EXCEPTION
     WHEN UTL_HTTP.end_of_body THEN
-      UTL_HTTP.end_response(l_resp);
+      UTL_HTTP.end_response(p_http.resp);
 --      INSERT INTO hcd_owner.junk_clob
 --        (myclob
 --        )VALUES
@@ -107,36 +105,36 @@ END https_call;
 --      COMMIT;
     WHEN OTHERS THEN
       dbms_output.put_line(SUBSTR(sqlerrm, 1, 900));
-      IF l_resp.HTTP_VERSION = 'UNSENT' THEN
-        UTL_HTTP.END_REQUEST(l_rqst);
+      IF p_http.resp.HTTP_VERSION = 'UNSENT' THEN
+        UTL_HTTP.END_REQUEST(p_http.rqst);
         --DBMS_OUTPUT.PUT_LINE('e1=UNSENT');
-        error_queue('HTTPS_CALL', 'E1=UNSENT');
+        error_queue('HEALTH_API', 'E1=UNSENT', 'PARSE_RESP');
       ELSE
         IF dbms_lob.getlength(l_clob) = 0 THEN
           l_clob := sqlerrm;
         END IF;
         BEGIN
-          UTL_HTTP.end_response(l_resp);
+          UTL_HTTP.end_response(p_http.resp);
         EXCEPTION
         WHEN OTHERS THEN
           --DBMS_OUTPUT.PUT_LINE('e2=' || SQLERRM);
-          error_queue('HTTPS_CALL', 'E2=' ||sqlerrm);
+          error_queue('HEALTH_API', 'E2=' ||sqlerrm, 'PARSE_RESP');
         END;
       END IF;
     END;
   ELSE
-    IF l_resp.status_code='500' --and vg_dml='EpicGoogleFitQueue'
+    IF p_http.resp.status_code='500' --and vg_dml='EpicGoogleFitQueue'
       THEN
       BEGIN
         LOOP
-          UTL_HTTP.read_text(l_resp, l_text, 300);
+          UTL_HTTP.read_text(p_http.resp, l_text, 300);
           --dbms_output.put_line(l_text);
           DBMS_LOB.writeappend(l_clob, LENGTH(l_text), l_text);
         END LOOP;
-        UTL_HTTP.end_response(l_resp);
+        UTL_HTTP.end_response(p_http.resp);
       EXCEPTION
       WHEN UTL_HTTP.end_of_body THEN
-        UTL_HTTP.end_response(l_resp);
+        UTL_HTTP.end_response(p_http.resp);
         --insert into hcd_owner.junk_clob(myclob)values (l_clob);
         --commit;
       END;
