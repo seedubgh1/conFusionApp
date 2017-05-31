@@ -1,5 +1,4 @@
-
-questions = {
+{
 	"response_code": 0,
 	"results": [{
 		"category": "Entertainment: Music",
@@ -51,47 +50,4 @@ questions = {
 		"Tom",
 		"Kitty"]
 	}]
-};
-
-
-var func = function (prop, val) {
-  //var jsonStr = '{"'+prop+'":'+val+'}';
-  var jsonStr = '{"'+prop+'":"'+val+'"}';
-  return JSON.parse(jsonStr);
-};
-
-var convert_questions = function (questions) {
-	var questions = questions.results;
-	var q_set= [];
-	var alexa_q = {};
-	
-	for (i = 0; i < questions.length; i += 1) {
-		//console.log(questions[i].question);  
-		alexa_q = func(questions[i].question,'17');
-
-		//--- build answers ---
-		answers = [];
-		answers = answers.concat(questions[i].correct_answer);
-		answers = answers.concat(questions[i].incorrect_answers);
-		//console.log('---=== answers ===---');
-		//console.log(answers);
-		
-		//console.log(Object.keys(alexa_q)[0]);
-		alexa_q[Object.keys(alexa_q)[0]] = answers;
-		
-		//console.log('---=== the question ===---');
-		//console.log(alexa_q);
-		
-		q_set.push(alexa_q);
-	};
-	
-	return q_set;
-};
-
-var theSet = {};
-theSet.QUESTIONS_EN_US = convert_questions(questions);
-theSet.QUESTIONS_EN_GB = convert_questions(questions);
-theSet.QUESTIONS_DE_DE = convert_questions(questions);
-console.log('---=== the set==---');
-console.log(theSet);
-console.log(theSet['QUESTIONS_EN_US'][4]);
+}
